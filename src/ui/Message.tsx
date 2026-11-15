@@ -171,10 +171,12 @@ interface Props {
     steps?: ToolStep[];
     streaming?: boolean;
     isLastAgent?: boolean;
+    /** e.g. "gpt-6.1-terra · medium" */
+    modelUsed?: string;
     h: MessageHandlers;
 }
 
-function MessageImpl({ client, room, item, replyItem, steps, streaming, isLastAgent, h }: Props) {
+function MessageImpl({ client, room, item, replyItem, steps, streaming, isLastAgent, modelUsed, h }: Props) {
     const speakingId = useSpeech((s) => s.speakingId);
     const readAloud = useUI((s) => s.settings.readAloud);
     const isAgent = !!item.agent;
@@ -279,6 +281,7 @@ function MessageImpl({ client, room, item, replyItem, steps, streaming, isLastAg
             <div className="content">
                 <div className="who">
                     {name}
+                    {modelUsed && <span className="model-used" title={`Model and reasoning effort in effect for this reply, as reported by ${name} in this conversation`}>({modelUsed})</span>}
                     <span className="time">{timeLabel(item.ts)}{item.edited && !streaming ? " · edited" : ""}</span>
                 </div>
                 {steps && steps.length > 0 && <ActivityStrip steps={steps} />}

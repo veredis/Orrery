@@ -7,6 +7,7 @@ import { listAgents, roomAgent } from "../agents/registry";
 import { isControlCommand, type AgentIdentity, type AgentModelOption } from "../agents/types";
 import { classifyHermesMessage } from "../agents/hermes";
 import { deriveTasks, type AgentTask } from "../agents/tasks";
+import { trackModels } from "../agents/modelTrack";
 
 const PREVIEW_HIDDEN = new Set(["model-picker", "model-switched", "reasoning-set", "reasoning-reset", "reasoning-status", "control-reply", "tool-progress"]);
 
@@ -163,6 +164,11 @@ export function agentStateFrom(model: TimelineModel | null, tasks: AgentTask[]):
             st.effortScope = "global config";
         }
     }
+    // A new session (`!new`) drops session-only overrides, so take model and effort from the replayed history.
+    const now = trackModels(model.items).current;
+    st.model = now.model;
+    st.effort = now.effort;
+    st.effortScope = now.effort ? (now.effortSession ? "this conversation" : "global config") : undefined;
     st.working = tasks.some((t) => t.status === "running" || t.status === "waiting");
     st.pendingApprovals = tasks.filter((t) => t.pendingApproval).length;
     return st;

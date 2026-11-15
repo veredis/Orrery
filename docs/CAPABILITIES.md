@@ -58,6 +58,7 @@ microphone, and installing on a physical phone. Check those on your own setup.
 | Approvals | ✅ / 🔌 | Card with Allow once / session / always / Deny. Each button sends Hermes's own reaction, and Hermes enforces it. "Always" asks for confirmation first. |
 | Model picker | ✅ / 🔌 | The list comes from the agent's `extraModels` plus any model menu Hermes posted. A switch sends one typed `!model <id> --provider <slug>` in that conversation, and the top bar shows the model and reasoning effort. Element shows those commands as normal messages. |
 | Reasoning effort | ✅ / 🔌 | `!reasoning <none…ultra>` and reset, per conversation. |
+| Model on each reply | 🟡 | Shown next to the agent's name, e.g. "Hermes (gpt-6.1-terra · high)". Hermes doesn't tag replies with a model, so Orrery works it out from the model and reasoning replies in that conversation, and drops session-only choices after a new session. Replies are left unlabelled when the conversation never said, and a default changed from another chat isn't seen. |
 | Per-chat agent | ✅ | Picked automatically from room membership, or set explicitly. |
 | Agent registry | ✅ | Agents from the deployment's config plus ones added in the app, stored in account data so every Orrery you use knows them. |
 | Tasks board | 🟡 | Built only from real room data: prompts, reactions, approvals and `dev.orrery.agent` task events. Hermes's own `!kanban` board isn't imported yet. |

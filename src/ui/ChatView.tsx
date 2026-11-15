@@ -14,10 +14,11 @@ import { I } from "./icons";
 import { openRoom, toast, useUI } from "./state";
 import { backToList } from "./swipeBack";
 import { roomAgent } from "../agents/registry";
+import { modelLabel, trackModels } from "../agents/modelTrack";
 
 type Row =
     | { kind: "day"; key: string; label: string }
-    | { kind: "item"; key: string; item: ChatItem; steps?: ToolStep[]; isLastAgent?: boolean; streaming?: boolean }
+    | { kind: "item"; key: string; item: ChatItem; steps?: ToolStep[]; isLastAgent?: boolean; streaming?: boolean; modelUsed?: string }
     | { kind: "chip"; key: string; text: string; mine: boolean }
     | { kind: "result"; key: string; text: string; icon: "model" | "brain" | "info" };
 
@@ -32,6 +33,7 @@ function dayLabel(ts: number) {
 
 function buildRows(model: TimelineModel, showControl: boolean, working: boolean): { rows: Row[]; liveSteps: ToolStep[] } {
     const rows: Row[] = [];
+    const used = trackModels(model.items).byItem;
     let lastDay = "";
     let stepBuf: ToolStep[] = [];
     let lastAgentIdx = -1;
@@ -74,7 +76,7 @@ function buildRows(model: TimelineModel, showControl: boolean, working: boolean)
             }
         }
         if (item.agent && v?.type !== "approval" && v?.type !== "orrery") {
-            rows.push({ kind: "item", key: item.id, item, steps: stepBuf.length ? stepBuf : undefined });
+            rows.push({ kind: "item", key: item.id, item, steps: stepBuf.length ? stepBuf : undefined, modelUsed: modelLabel(used.get(item.id)) || undefined });
             stepBuf = [];
             lastAgentIdx = rows.length - 1;
             continue;
@@ -213,9 +215,11 @@ export function ChatView({ client, room, agents, onAgentState }: Props) {
     const doExport = async () => {
         setMenuOpen(false);
         const lines = [`# ${room.name}`, "", `Exported from Orrery on ${new Date().toLocaleString()}. Only messages loaded on this device are included.`, ""];
+        const used = trackModels(model?.items ?? []).byItem;
         for (const it of model?.items ?? []) {
             if (it.kind === "membership" || it.kind === "room-state" || it.isControl || (it.agentView && it.agentView.type !== "approval")) continue;
-            const who = it.agent?.name ?? (it.mine ? "You" : room.getMember(it.sender)?.name ?? it.sender);
+            const m = modelLabel(used.get(it.id));
+            const who = it.agent ? `${it.agent.name}${m ? ` (${m})` : ""}` : it.mine ? "You" : room.getMember(it.sender)?.name ?? it.sender;
             lines.push(`### ${who} — ${new Date(it.ts).toLocaleString()}`, "", it.kind === "undecryptable" ? "_(encrypted message not available on this device)_" : it.body || `_(${it.kind})_`, "");
         }
         const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
@@ -317,7 +321,7 @@ export function ChatView({ client, room, agents, onAgentState }: Props) {
                                     </div>
                                 )}
                                 {r.kind === "item" && (
-                                    <Message client={client} room={room} item={r.item} replyItem={r.item.replyTo ? model?.byId.get(r.item.replyTo) : undefined} steps={r.steps} streaming={r.streaming} isLastAgent={r.isLastAgent} h={h} />
+                                    <Message client={client} room={room} item={r.item} replyItem={r.item.replyTo ? model?.byId.get(r.item.replyTo) : undefined} steps={r.steps} streaming={r.streaming} isLastAgent={r.isLastAgent} modelUsed={r.modelUsed} h={h} />
                                 )}
                             </Fragment>
                         ))}

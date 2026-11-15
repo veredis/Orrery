@@ -6,7 +6,8 @@
 const [, , cmd, arg] = process.argv;
 const port = process.env.CDP_PORT ?? "9333";
 const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
-const page = list.find((t) => t.type === "page");
+// Prefer the app's own page over browser-internal ones (Edge opens a "Microsoft Voices" page).
+const page = list.find((t) => t.type === "page" && /^(https?|orrery):/.test(t.url)) ?? list.find((t) => t.type === "page");
 if (!page) throw new Error("no page target");
 const ws = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((r, j) => {
