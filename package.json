@@ -26,6 +26,17 @@
   "dependencies": {
     "electron-updater": "6.8.11"
   },
+  "bundledInApp": [
+    "@huggingface/transformers",
+    "dompurify",
+    "highlight.js",
+    "marked",
+    "matrix-encrypt-attachment",
+    "matrix-js-sdk",
+    "react",
+    "react-dom",
+    "zustand"
+  ],
   "devDependencies": {
     "@huggingface/transformers": "4.3.2",
     "@resvg/resvg-js": "2.6.2",

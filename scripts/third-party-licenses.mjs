@@ -1,4 +1,5 @@
-// Generates THIRD-PARTY-LICENSES.txt from the production dependency tree (what ships in the app).
+// Generates THIRD-PARTY-LICENSES.txt from what ships in the app: "dependencies" (packed by
+// electron-builder for the main process) plus "bundledInApp" (compiled into the web bundle by Vite).
 import fs from "node:fs";
 import path from "node:path";
 
@@ -34,7 +35,7 @@ function walk(name, fromDir) {
     for (const dep of Object.keys({ ...p.dependencies, ...p.optionalDependencies })) walk(dep, dir);
 }
 
-for (const dep of Object.keys(pkg.dependencies)) walk(dep, root);
+for (const dep of [...Object.keys(pkg.dependencies ?? {}), ...(pkg.bundledInApp ?? [])]) walk(dep, root);
 
 const entries = [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
 let out = `Orrery ${pkg.version} — third-party software notices\n`;
