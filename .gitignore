@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-web/
+release/
+public/models/
+public/ort/
+.harness/
+*.log
+.env*
+
+# Personal deployment config, notes and harness settings (see config/README.md)
+local/
+# Editor/preview launch settings
+.claude/
