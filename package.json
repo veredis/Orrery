@@ -112,7 +112,7 @@
         "provider": "github",
         "owner": "veredis",
         "repo": "Orrery",
-        "releaseType": "release"
+        "releaseType": "draft"
       }
     ]
   },
