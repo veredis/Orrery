@@ -35,18 +35,20 @@ try {
 const existing = spawnSync("gh", ["release", "view", tag, "--repo", `${gh.owner}/${gh.repo}`], { stdio: "ignore" });
 if (existing.status === 0) fail(`release ${tag} already exists on GitHub. Bump the version.`);
 
-console.log(`Pushing ${tag}…`);
-sh("git", ["push", "origin", "HEAD", tag], { stdio: "inherit" });
-
 // Fixed command strings only (no outside input), run through the shell so npm resolves on Windows.
 const run = (command) => {
     const r = spawnSync(command, { stdio: "inherit", shell: true, env: { ...process.env, GH_TOKEN: token } });
     if (r.status !== 0) fail(`\`${command}\` failed.`);
 };
 const repo = `${gh.owner}/${gh.repo}`;
-console.log(`Building and publishing Orrery ${version}…`);
+// `npm version` regenerates the notices into the release commit; check before pushing anything.
 run("npm run licenses");
-if (sh("git", ["status", "--porcelain"])) fail("license notices changed. Commit THIRD-PARTY-LICENSES.txt, move the tag, and run again.");
+if (sh("git", ["status", "--porcelain"])) fail("license notices are out of date. Commit THIRD-PARTY-LICENSES.txt, move the tag to that commit, and run again.");
+
+console.log(`Pushing ${tag}…`);
+sh("git", ["push", "origin", "HEAD", tag], { stdio: "inherit" });
+
+console.log(`Building and publishing Orrery ${version}…`);
 run("npm run build");
 // Create the release as a draft first: electron-builder uploads its files in parallel and would
 // otherwise create one release per file. It uploads into this draft, then we publish it.

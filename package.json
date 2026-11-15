@@ -21,6 +21,7 @@
     "licenses": "node scripts/third-party-licenses.mjs",
     "dist:win": "npm run licenses && npm run build && electron-builder --win --x64",
     "harness": "node scripts/harness/hermes-e2e.mjs",
+    "version": "npm run licenses && git add THIRD-PARTY-LICENSES.txt",
     "release": "node scripts/release.mjs"
   },
   "dependencies": {
