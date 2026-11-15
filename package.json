@@ -1,7 +1,7 @@
 {
   "name": "orrery",
   "productName": "Orrery",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Orrery — an AI-first Matrix client for Hermes and other agents",
   "license": "AGPL-3.0-or-later",
   "private": true,
